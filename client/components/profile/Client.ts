@@ -1,3 +1,6 @@
+import { Dispatch, SetStateAction } from 'react'
+import { GiEarthAmerica } from 'react-icons/gi'
+
 import { CeramicClient } from '@ceramicnetwork/http-client'
 import { DID } from 'dids'
 
