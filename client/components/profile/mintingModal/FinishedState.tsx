@@ -4,6 +4,23 @@ import Image from 'next/image'
 import checkMark from '../../../assets/check.png'
 import { useRouter } from 'next/router'
 
+const accessControlConditions = [
+    {
+      "contractAddress": "",
+      "standardContractType": "",
+      "chain": "ethereum",
+      "method": "eth_getBalance",
+      "parameters": [
+        ":userAddress",
+        "latest"
+      ],
+      "returnValueTest": {
+        "comparator": ">=",
+        "value": "100000000000000000000"
+      }
+    }
+  ]
+
 const style = {
   wrapper: `h-[20rem] w-[35rem] text-white bg-[#15202b] rounded-3xl p-10 flex flex-col items-center justify-center`,
   title: `font-semibold text-xl mb-6`,
