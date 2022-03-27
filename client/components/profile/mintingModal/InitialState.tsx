@@ -1,5 +1,70 @@
 import { Dispatch, SetStateAction } from 'react'
 import { GiEarthAmerica } from 'react-icons/gi'
+import { Provider } from '@self.id/framework'
+
+function App({ children }) {
+  return <Provider client={{ ceramic: 'testnet-clay' }}>{children}</Provider>
+}
+
+function ConnectButton() {
+  const [connection, connect, disconnect] = useConnection()
+
+  return connection.status === 'connected' ? (
+    <button
+      onClick={() => {
+        disconnect()
+      }}>
+      Disconnect ({connection.selfID.id})
+    </button>
+  ) : 'ethereum' in window ? (
+    <button
+      disabled={connection.status === 'connecting'}
+      onClick={() => {
+        connect()
+      }}>
+      Connect
+    </button>
+  ) : (
+    <p>
+      An injected Ethereum provider such as{' '}
+      <a href="https://metamask.io/">MetaMask</a> is needed to authenticate.
+    </p>
+  )
+}
+
+export const getServerSideProps = async (ctx) => {
+  const client = new RequestClient({
+    ceramic: 'testnet-clay',
+    // Inject the cookie from the request headers to parse the viewerID
+    cookie: ctx.req.headers.cookie,
+  })
+  if (client.viewerID != null) {
+    // If the viewerID is set, fetch its profile
+    await client.prefetch('basicProfile', client.viewerID)
+  }
+  return { props: { state: client.getState() } }
+}
+
+// Use the state prop injected by the server
+export default function Home({ state }) {
+  return (
+    <Provider state={state}>
+      <ShowViewerName />
+    </Provider>
+  )
+}
+
+function ShowViewerName() {
+  const record = useViewerRecord('basicProfile')
+
+  const text = record.isLoading
+    ? 'Loading...'
+    : record.content
+    ? `Hello ${record.content.name || 'stranger'}`
+    : 'No profile to load'
+  return <p>{text}</p>
+}
+
 
 const style = {
   wrapper: `h-[20rem] w-[35rem] text-white bg-[#15202b] rounded-3xl p-10 flex flex-col`,
